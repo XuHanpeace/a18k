@@ -9,6 +9,11 @@
   "keywords": [
     "akulaku frontend translation check tool"
   ],
+  "homepage": "https://github.com/XuHanpeace/a18k",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XuHanpeace/a18k.git"
+  },
   "author": "xuhan",
   "license": "ISC",
   "bin": {
