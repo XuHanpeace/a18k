@@ -41,7 +41,9 @@ if(argv[0] === 'check') {
     showHelp()
     return 
   }
-  traverseDir(rootPath)
+  console.log('--------------开始读取--------------\n')
+  var arr = traverseDir(rootPath)
+  pickup(arr)
   return
 }else {
   console.log(`Unknown parameter: ${argv[0]}. `)
@@ -56,6 +58,76 @@ function showHelp() {
     -p    指定待检查的文件夹的相对路径。默认为当前路径下的'./views'
     -h    显示帮助 
   `)
+}
+
+/* 
+ * 递归遍历目录
+ * @param rootPath 待遍历文件夹的根路径
+*/
+function traverseDir(rootPath) {
+	let files = fs.readdirSync(rootPath)
+  let filesArr = []
+
+ 	files.forEach((filename) => {
+ 		let fullPath = path.join(rootPath, filename)
+ 		// console.log(fullPath) 	
+ 		let stats = fs.statSync(fullPath)
+ 		let isFile = stats.isFile()
+ 		let isDir = stats.isDirectory()
+
+ 		if(isFile) {
+ 			if(path.extname(fullPath) === '.js') {
+        console.log(`正在读取 ${fullPath}`)
+ 				filesArr.push(fullPath)
+ 			}
+ 		}
+ 		if(isDir) {
+ 			filesArr = filesArr.concat(traverseDir(fullPath))
+ 		}
+ 	})
+ 	return filesArr
+}
+
+/* 
+ * 提取未翻译的文案
+ * @param arr
+*/
+function pickup(arr = []) {
+  let text = [], _text = []
+  arr.forEach((filePath) => {
+    let _string = fs.readFileSync(filePath, {
+      encoding: 'utf8'
+    })
+    var reg = /translate\([\s\S]+?\)/g
+
+    if (_string.match(reg)) {
+      _text = _string
+          .match(reg)
+          .map((item, index) => {
+            return item.replace(/[\s\S]+(\'|\")(.+?)(\'|\")[\s\S]+/, '$2')
+          })
+          .filter(key => {
+            
+            if (!locale[key] || locale[key] === '') {
+              return key
+            }
+          })
+      if(_text.length > 0) {
+        text.push(..._text)
+      }
+    }
+  })
+
+  text = [...new Set(text)]
+  if(text.length) {
+    console.log(`\n--------------读取完成，一共发现${text.length}个未翻译项--------------`)
+  }else {
+    console.log(`\n--------------读取完成，未检测到未翻译项，可以放心转测了--------------`)
+  }
+  fs.writeFileSync('./send2pm.txt', text.join('\r'), err => {
+    if (err) throw err
+    console.log("It's saved!")
+  })
 }
 
 /* 
@@ -80,69 +152,3 @@ function parseParam(arr) {
     rootPath: __rootPath
   }
 }
-
-/* 
- * 文件遍历
- * @param rootPath 需要遍历的文件夹路径
-*/
-function traverseDir(rootPath) {
-  fs.readdir(rootPath, (err, files) => {
-    if (err) {
-      console.warn(err)
-    } else {
-      //files为读取到的文件名列表
-      files.forEach(fileName => {
-        //拼接文件绝对路径
-        var filePath = path.join(rootPath, fileName)
-        fs.stat(filePath, (err, stats) => {
-          if (err) {
-            console.warn(err)
-          } else {
-            var isFile = stats.isFile(), //判断是否是文件
-              isDir = stats.isDirectory() //判断是否是文件夹
-            if (isFile) {
-              if (path.extname(filePath) === '.js') {
-                console.log(`正在读取${filePath}`)
-                extract(filePath)
-              }
-            }
-            if (isDir) {
-              traverseDir(filePath)
-            }
-          }
-        })
-      })
-    }
-  })
-}
-
-/* 
- * 提取文翻译文案
- * @param filepath 需要检测的.js文件
-*/
-function extract(filepath) {
-  var string = fs.readFileSync(filepath, {
-    encoding: 'utf8'
-  })
-  var reg = /translate\([\s\S]+?\)/g
-
-  if (string.match(reg)) {
-    var arr = string
-      .match(reg)
-      .map((item, index) => {
-        return item.replace(/[\s\S]+(\'|\")(.+?)(\'|\")[\s\S]+/, '$2')
-      })
-      .filter(key => {
-        if (!locale[key] || locale[key] === '') {
-          return key
-        }
-      })
-  }
-  // console.log(textArr)
-  textArr = [...new Set(textArr.concat(arr))]
-  fs.writeFileSync('./send2pm.txt', textArr.join('\r'), err => {
-    if (err) throw err
-    console.log("It's saved!")
-  })
-}
-
