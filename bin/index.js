@@ -25,6 +25,7 @@ if(argv[0] === 'check') {
   let pathObj = parseParam(argv)
   let localePath = pathObj.localePath
   let rootPath = pathObj.rootPath
+  let fnName = pathObj.fnName
 
   try{
     localeString = fs.readFileSync(localePath)
@@ -43,7 +44,7 @@ if(argv[0] === 'check') {
   }
   console.log('--------------开始读取--------------\n')
   var arr = traverseDir(rootPath)
-  pickup(arr)
+  pickup(arr, fnName)
   return
 }else {
   console.log(`Unknown parameter: ${argv[0]}. `)
@@ -56,6 +57,7 @@ function showHelp() {
   可选参数：
     -j    指定语言包的相对路径。默认为当前路径下'./assets/i18n/vi.json'
     -p    指定待检查的文件夹的相对路径。默认为当前路径下的'./views'
+    -t    指定翻译函数名
     -h    显示帮助 
   `)
 }
@@ -92,13 +94,14 @@ function traverseDir(rootPath) {
  * 提取未翻译的文案
  * @param arr
 */
-function pickup(arr = []) {
+function pickup(arr = [], fnName) {
   let text = [], _text = []
   arr.forEach((filePath) => {
     let _string = fs.readFileSync(filePath, {
       encoding: 'utf8'
     })
-    var reg = /translate\([\s\S]+?\)/g
+    // var reg = /translate\([\s\S]+?\)/g
+    let reg = new RegExp(`${fnName}\\([\\'\\"][\\s\\S]+?[\\'\\"]\\)`, 'g')
 
     if (_string.match(reg)) {
       _text = _string
@@ -137,8 +140,10 @@ function pickup(arr = []) {
 function parseParam(arr) {
   let __localePath = './assets/i18n/vi.json',
       __rootPath = './views',
+      __defaultFnName = 'translate',
       __indexOfJ = arr.indexOf('-j'), //参数-j的下标
-      __indexOfP = arr.indexOf('-p') //参数-p的下标
+      __indexOfP = arr.indexOf('-p'), //参数-p的下标
+      __indexOfT = arr.indexOf('-t') //翻译函数名
   
   if(__indexOfJ > 0) { 
     __localePath = arr[__indexOfJ + 1]
@@ -146,9 +151,13 @@ function parseParam(arr) {
   if(__indexOfP > 0) {
     __rootPath = arr[__indexOfP + 1]
   }
+  if(__indexOfT > 0) {
+    __defaultFnName = arr[__indexOfT + 1]
+  }
 
   return {
     localePath: __localePath,
-    rootPath: __rootPath
+    rootPath: __rootPath,
+    fnName: __defaultFnName
   }
 }
