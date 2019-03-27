@@ -138,7 +138,7 @@ function pickup(arr = [], fnName) {
  * @param arr 键入的参数
 */
 function parseParam(arr) {
-  let __localePath = './assets/i18n/vi.json',
+  let __localePath = './assets/i18n/in.json',
       __rootPath = './views',
       __defaultFnName = 'translate',
       __indexOfJ = arr.indexOf('-j'), //参数-j的下标

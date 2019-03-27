@@ -17,8 +17,9 @@ a18k, born to find those untranslated WenAn out for you, PEACE!
 > a18k -h 
 
 可选参数：
-    -j    指定语言包的相对路径。默认为当前路径下'./assets/i18n/vi.json'
+    -j    指定语言包的相对路径。默认为当前路径下'./assets/i18n/in.json'
     -p    指定待检查的文件夹的相对路径。默认为当前路径下的'./views'
+    -t    指定翻译函数名。默认为translate
     -h    显示帮助
 ```
 
@@ -34,7 +35,7 @@ a18k, born to find those untranslated WenAn out for you, PEACE!
 ```bash
 > a18k check
 ```
-工具将会直接读取``./assets/i18n/vi.json``文件，检测``./views``文件夹下所有的文案
+工具将会直接读取``./assets/i18n/in.json``文件，检测``./views``文件夹下所有的文案
 
 所以，你的目录结构最好像下面这个样子，否则你只能手动设置语言包的路径了
 ```bash
