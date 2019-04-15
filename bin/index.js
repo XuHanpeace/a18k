@@ -101,7 +101,8 @@ function pickup(arr = [], fnName) {
       encoding: 'utf8'
     })
     // var reg = /translate\([\s\S]+?\)/g
-    let reg = new RegExp(`${fnName}\\([\\'\\"][\\s\\S]+?[\\'\\"]\\)`, 'g')
+    // let reg = new RegExp(`${fnName}\\([\\'\\"][\\s\\S]+?[\\'\\"]\\)`, 'g')
+    let reg = new RegExp(`${fnName}\\([\\s\\S]+?\\)`, 'g')
 
     if (_string.match(reg)) {
       _text = _string
