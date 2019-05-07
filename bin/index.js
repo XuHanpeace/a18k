@@ -55,7 +55,7 @@ if(argv[0] === 'check') {
 function showHelp() {
   console.log(`
   可选参数：
-    -j    指定语言包的相对路径。默认为当前路径下'./assets/i18n/vi.json'
+    -j    指定语言包的相对路径。默认为当前路径下'./assets/i18n/in.json'
     -p    指定待检查的文件夹的相对路径。默认为当前路径下的'./views'
     -t    指定翻译函数名
     -h    显示帮助 
@@ -102,7 +102,7 @@ function pickup(arr = [], fnName) {
     })
     // var reg = /translate\([\s\S]+?\)/g
     // let reg = new RegExp(`${fnName}\\([\\'\\"][\\s\\S]+?[\\'\\"]\\)`, 'g')
-    let reg = new RegExp(`${fnName}\\([\\s\\S]+?\\)`, 'g')
+    let reg = new RegExp(`[^a-zA-Z]${fnName}\\([\\s\\S]+?\\)`, 'g')
 
     if (_string.match(reg)) {
       _text = _string
